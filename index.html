@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Music Theory Cheat Sheet</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+
+<body>
+  <h1>Music Theory Cheat Sheet</h1>
+  <!-- Circle of Fifths -->
+  <div style="margin: 16px; text-align: center;">
+    <label><input type="checkbox" id="previewMode" /> Preview chords on hover</label>
+    <label style="margin-left: 20px;"><input type="checkbox" id="sharpFlatToggle" /> Show flats (e.g. Bb)</label>
+  </div>
+  <canvas id="circle" width="400" height="400"></canvas>
+
+  <!-- Piano Keyboard -->
+  <div id="pianoboard">
+    <div class="white-keys"></div>
+    <div class="black-keys"></div>
+  </div>
+
+  <!-- Scale -->
+  <div class="scale-controls">
+    <label for="piano-root">Root:</label>
+    <select id="piano-root">
+      <option>C</option>
+      <option>C#</option>
+      <option>D</option>
+      <option>D#</option>
+      <option>E</option>
+      <option>F</option>
+      <option>F#</option>
+      <option>G</option>
+      <option>G#</option>
+      <option>A</option>
+      <option>A#</option>
+      <option>B</option>
+    </select>
+
+    <label for="piano-scale">Scale:</label>
+    <select id="piano-scale">
+      <option value="">Select a scale</option>
+      <option value="Major (Ionian)">Major</option>
+      <option value="Aeolian (Natural Minor)">Natural Minor</option>
+      <option value="Harmonic Minor">Harmonic Minor</option>
+      <option value="Melodic Minor">Melodic Minor</option>
+      <option value="Major Pentatonic">Major Pentatonic</option>
+      <option value="Minor Pentatonic">Minor Pentatonic</option>
+      <option value="Blues">Blues Minor</option>
+    </select>
+    <button class="barre-toggle" onclick="showScaleOnPiano()">Show on Piano</button>
+  </div>
+
+
+  <!-- Chord Input -->
+  <div class="chord-input-wrapper">
+    <div class="chord-input-row">
+      <div>
+        <input id="chord-input" placeholder="Enter chord (e.g. Cmaj7)" aria-label="Chord input" />
+        <div id="chord-name" class="chord-name" aria-live="polite"></div>
+      </div>
+      <div class="chord-help-box">
+        <strong>Examples:</strong>
+        <ul>
+          <li>C</li>
+          <li>Cm</li>
+          <li>C7</li>
+          <li>Cmaj7</li>
+          <li>Cm7</li>
+          <li>Cdim</li>
+          <li>Caug</li>
+          <li>Csus2</li>
+          <li>Csus4</li>
+          <li>Cdim7</li>
+          <li>Cm7b5</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guitar Fretboard -->
+  <div id="fretboard-container" role="application" aria-label="Guitar fretboard" tabindex="0"></div>
+
+  <div class="bottom-controls">
+    <div class="tuning-controls">
+      <select id="tuning-selector">
+        <option value="E4,B3,G3,D3,A2,E2">Standard (EADGBE)</option>
+        <option value="E4,B3,G3,D3,A2,D2">Drop D</option>
+        <option value="D4,A3,G3,D3,A2,D2">DADGAD</option>
+        <option value="E4,C4,G3,C3,G2,C2">Open C</option>
+        <option value="D4,B3,G3,D3,A2,D2">Double Drop D</option>
+        <option value="D#4,A#3,F#3,C#3,G#2,C#2">Drop C#</option>
+        <option value="D4,A3,F3,C3,G2,C2">Drop C</option>
+        <option value="B3,F#3,D3,A2,E2,A1">Drop A</option>
+        <option value="custom">Custom...</option>
+      </select>
+
+
+      <div id="custom-tuning-inputs" style="display: none;">
+        <label>Custom Tuning (6 strings):</label>
+        <input type="text" id="custom-string-1" placeholder="E4" size="4" />
+        <input type="text" id="custom-string-2" placeholder="B3" size="4" />
+        <input type="text" id="custom-string-3" placeholder="G3" size="4" />
+        <input type="text" id="custom-string-4" placeholder="D3" size="4" />
+        <input type="text" id="custom-string-5" placeholder="A2" size="4" />
+        <input type="text" id="custom-string-6" placeholder="E2" size="4" />
+        <button id="apply-custom-tuning">Apply</button>
+      </div>
+
+      <label for="capo-selector">Capo Fret:</label>
+      <select id="capo-selector">
+        <option value="0">None</option>
+        <option value="1">1st</option>
+        <option value="2">2nd</option>
+        <option value="3">3rd</option>
+        <option value="4">4th</option>
+        <option value="5">5th</option>
+        <option value="6">6th</option>
+        <option value="7">7th</option>
+      </select>
+    </div>
+
+    <select id="scale-selector">
+      <option value="">Select a scale</option>
+      <option value="C|Major (Ionian)">C Major</option>
+      <option value="A|Minor Pentatonic">A Minor Pentatonic</option>
+      <option value="E|Blues">E Blues</option>
+      <option value="D|Dorian">D Dorian</option>
+      <option value="G|Mixolydian">G Mixolydian</option>
+      <option value="F|Lydian">F Lydian</option>
+      <option value="B|Phrygian">B Phrygian</option>
+      <option value="A|Aeolian (Natural Minor)">A Aeolian</option>
+      <option value="B|Locrian">B Locrian</option>
+      <option value="G|Major Pentatonic">G Major Pentatonic</option>
+    </select>
+
+    <label>
+      <input type="checkbox" id="showIntervals" checked>
+      Show interval labels
+    </label>
+
+    <button id="clear-fretboard" class="barre-toggle">Clear</button>
+
+    <!-- Barre Chord Mode Button -->
+    <button id="toggle-barre" aria-pressed="false" class="barre-toggle" aria-label="Toggle barre chord mode">
+      Barre Chord Mode: OFF
+    </button>
+
+    <label for="volume-slider">Volume</label>
+    <input type="range" id="volume-slider" min="-60" max="0" step="1" value="-6" aria-label="Volume slider" />
+  </div>
+
+  <div id="interval-charts" class="interval-charts">
+    <h2>Chromatic Intervals</h2>
+
+    <!-- TABLE 1: SIMPLE INTERVALS -->
+    <h3>Simple Intervals (0–12 semitones)</h3>
+    <table class="interval-table">
+      <thead>
+        <tr>
+          <td>Interval Name</td>
+          <td>Perfect Unison</td>
+          <td>Minor 2nd</td>
+          <td>Major 2nd</td>
+          <td>Minor 3rd</td>
+          <td>Major 3rd</td>
+          <td>Perfect 4th</td>
+          <td>Tritone</td>
+          <td>Perfect 5th</td>
+          <td>Minor 6th</td>
+          <td>Major 6th</td>
+          <td>Minor 7th</td>
+          <td>Major 7th</td>
+          <td>Perfect Octave</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Notation</td>
+          <td>P1/R</td>
+          <td>m2/b2</td>
+          <td>M2/2</td>
+          <td>m3/b3</td>
+          <td>M3/3</td>
+          <td>P4/4</td>
+          <td>A4/d5/#4</td>
+          <td>P5/5</td>
+          <td>m6/b6</td>
+          <td>M6/6</td>
+          <td>m7/b7</td>
+          <td>M7/7</td>
+          <td>P8/8</td>
+        </tr>
+        <tr>
+          <td>Type</td>
+          <td>Perfect</td>
+          <td>Minor</td>
+          <td>Major</td>
+          <td>Minor</td>
+          <td>Major</td>
+          <td>Perfect</td>
+          <td>Aug/Dim</td>
+          <td>Perfect</td>
+          <td>Minor</td>
+          <td>Major</td>
+          <td>Minor</td>
+          <td>Major</td>
+          <td>Perfect</td>
+        </tr>
+        <tr>
+          <th>Semitones</th>
+          <th>0</th>
+          <th>1</th>
+          <th>2</th>
+          <th>3</th>
+          <th>4</th>
+          <th>5</th>
+          <th>6</th>
+          <th>7</th>
+          <th>8</th>
+          <th>9</th>
+          <th>10</th>
+          <th>11</th>
+          <th>12</th>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- TABLE 2: COMPOUND INTERVALS -->
+    <h3>Compound Intervals (13–24 semitones)</h3>
+    <table class="interval-table">
+      <thead>
+        <tr>
+          <td>Interval Name</td>
+          <td>Minor 9th</td>
+          <td>Major 9th</td>
+          <td>Minor 10th</td>
+          <td>Major 10th</td>
+          <td>Perfect 11th</td>
+          <td>Augmented 11th</td>
+          <td>Perfect 12th</td>
+          <td>Minor 13th</td>
+          <td>Major 13th</td>
+          <td>Minor 14th</td>
+          <td>Major 14th</td>
+          <td>Double Octave</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Notation</td>
+          <td>m9/b9</td>
+          <td>M9/9</td>
+          <td>m10/b10</td>
+          <td>M10/10</td>
+          <td>P11/11</td>
+          <td>Aug11/#11</td>
+          <td>P12</td>
+          <td>m13/b13</td>
+          <td>M13/13</td>
+          <td>m14/b14</td>
+          <td>M14/14</td>
+          <td>P15/15</td>
+        </tr>
+        <tr>
+          <th>Semitones</th>
+          <th>13</th>
+          <th>14</th>
+          <th>15</th>
+          <th>16</th>
+          <th>17</th>
+          <th>18</th>
+          <th>19</th>
+          <th>20</th>
+          <th>21</th>
+          <th>22</th>
+          <th>23</th>
+          <th>24</th>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <div id="key-charts-wrapper" class="key-charts-wrapper">
+
+    <!-- MAJOR KEY CHORD CHART -->
+    <div id="chord-key-chart" class="chord-key-chart">
+      <h2>Major Key Chord Chart</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Major Key</th>
+            <th>I</th>
+            <th>ii</th>
+            <th>iii</th>
+            <th>IV</th>
+            <th>V</th>
+            <th>vi</th>
+            <th>vii°</th>
+            <th>Relative Minor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>C</td>
+            <td>C</td>
+            <td>Dm</td>
+            <td>Em</td>
+            <td>F</td>
+            <td>G</td>
+            <td>Am</td>
+            <td>Bdim</td>
+            <td>A minor</td>
+          </tr>
+          <tr>
+            <td>G</td>
+            <td>G</td>
+            <td>Am</td>
+            <td>Bm</td>
+            <td>C</td>
+            <td>D</td>
+            <td>Em</td>
+            <td>F#dim</td>
+            <td>E minor</td>
+          </tr>
+          <tr>
+            <td>D</td>
+            <td>D</td>
+            <td>Em</td>
+            <td>F#m</td>
+            <td>G</td>
+            <td>A</td>
+            <td>Bm</td>
+            <td>C#dim</td>
+            <td>B minor</td>
+          </tr>
+          <tr>
+            <td>A</td>
+            <td>A</td>
+            <td>Bm</td>
+            <td>C#m</td>
+            <td>D</td>
+            <td>E</td>
+            <td>F#m</td>
+            <td>G#dim</td>
+            <td>F# minor</td>
+          </tr>
+          <tr>
+            <td>E</td>
+            <td>E</td>
+            <td>F#m</td>
+            <td>G#m</td>
+            <td>A</td>
+            <td>B</td>
+            <td>C#m</td>
+            <td>D#dim</td>
+            <td>C# minor</td>
+          </tr>
+          <tr>
+            <td>B</td>
+            <td>B</td>
+            <td>C#m</td>
+            <td>D#m</td>
+            <td>E</td>
+            <td>F#</td>
+            <td>G#m</td>
+            <td>A#dim</td>
+            <td>G# minor</td>
+          </tr>
+          <tr>
+            <td>F</td>
+            <td>F</td>
+            <td>Gm</td>
+            <td>Am</td>
+            <td>Bb</td>
+            <td>C</td>
+            <td>Dm</td>
+            <td>Edim</td>
+            <td>D minor</td>
+          </tr>
+          <tr>
+            <td>Bb</td>
+            <td>Bb</td>
+            <td>Cm</td>
+            <td>Dm</td>
+            <td>Eb</td>
+            <td>F</td>
+            <td>Gm</td>
+            <td>Adim</td>
+            <td>G minor</td>
+          </tr>
+          <tr>
+            <td>Eb</td>
+            <td>Eb</td>
+            <td>Fm</td>
+            <td>Gm</td>
+            <td>Ab</td>
+            <td>Bb</td>
+            <td>Cm</td>
+            <td>Ddim</td>
+            <td>C minor</td>
+          </tr>
+          <tr>
+            <td>Ab</td>
+            <td>Ab</td>
+            <td>Bbm</td>
+            <td>Cm</td>
+            <td>Db</td>
+            <td>Eb</td>
+            <td>Fm</td>
+            <td>Gdim</td>
+            <td>F minor</td>
+          </tr>
+          <tr>
+            <td>Db</td>
+            <td>Db</td>
+            <td>Ebm</td>
+            <td>Fm</td>
+            <td>Gb</td>
+            <td>Ab</td>
+            <td>Bbm</td>
+            <td>Cdim</td>
+            <td>Bb minor</td>
+          </tr>
+          <tr>
+            <td>Gb</td>
+            <td>Gb</td>
+            <td>Abm</td>
+            <td>Bbm</td>
+            <td>Cb</td>
+            <td>Db</td>
+            <td>Ebm</td>
+            <td>Fdim</td>
+            <td>Eb minor</td>
+          </tr>
+          <tr>
+            <td>Cb</td>
+            <td>Cb</td>
+            <td>Dbm</td>
+            <td>Ebm</td>
+            <td>Fb</td>
+            <td>Gb</td>
+            <td>Abm</td>
+            <td>Bbdim</td>
+            <td>Ab minor</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- MINOR KEY CHORD CHART -->
+    <div id="minor-chord-key-chart" class="chord-key-chart">
+      <h2>Minor Key Chord Chart</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Minor Key</th>
+            <th>i</th>
+            <th>ii°</th>
+            <th>III</th>
+            <th>iv</th>
+            <th>v</th>
+            <th>VI</th>
+            <th>VII</th>
+            <th>Relative Major</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>A minor</td>
+            <td>Am</td>
+            <td>Bdim</td>
+            <td>C</td>
+            <td>Dm</td>
+            <td>Em</td>
+            <td>F</td>
+            <td>G</td>
+            <td>C</td>
+          </tr>
+          <tr>
+            <td>E minor</td>
+            <td>Em</td>
+            <td>F#dim</td>
+            <td>G</td>
+            <td>Am</td>
+            <td>Bm</td>
+            <td>C</td>
+            <td>D</td>
+            <td>G</td>
+          </tr>
+          <tr>
+            <td>B minor</td>
+            <td>Bm</td>
+            <td>C#dim</td>
+            <td>D</td>
+            <td>Em</td>
+            <td>F#m</td>
+            <td>G</td>
+            <td>A</td>
+            <td>D</td>
+          </tr>
+          <tr>
+            <td>F# minor</td>
+            <td>F#m</td>
+            <td>G#dim</td>
+            <td>A</td>
+            <td>Bm</td>
+            <td>C#m</td>
+            <td>D</td>
+            <td>E</td>
+            <td>A</td>
+          </tr>
+          <tr>
+            <td>C# minor</td>
+            <td>C#m</td>
+            <td>D#dim</td>
+            <td>E</td>
+            <td>F#m</td>
+            <td>G#m</td>
+            <td>A</td>
+            <td>B</td>
+            <td>E</td>
+          </tr>
+          <tr>
+            <td>G# minor</td>
+            <td>G#m</td>
+            <td>A#dim</td>
+            <td>B</td>
+            <td>C#m</td>
+            <td>D#m</td>
+            <td>E</td>
+            <td>F#</td>
+            <td>B</td>
+          </tr>
+          <tr>
+            <td>D minor</td>
+            <td>Dm</td>
+            <td>Edim</td>
+            <td>F</td>
+            <td>Gm</td>
+            <td>Am</td>
+            <td>Bb</td>
+            <td>C</td>
+            <td>F</td>
+          </tr>
+          <tr>
+            <td>G minor</td>
+            <td>Gm</td>
+            <td>Adim</td>
+            <td>Bb</td>
+            <td>Cm</td>
+            <td>Dm</td>
+            <td>Eb</td>
+            <td>F</td>
+            <td>Bb</td>
+          </tr>
+          <tr>
+            <td>C minor</td>
+            <td>Cm</td>
+            <td>Ddim</td>
+            <td>Eb</td>
+            <td>Fm</td>
+            <td>Gm</td>
+            <td>Ab</td>
+            <td>Bb</td>
+            <td>Eb</td>
+          </tr>
+          <tr>
+            <td>F minor</td>
+            <td>Fm</td>
+            <td>Gdim</td>
+            <td>Ab</td>
+            <td>Bbm</td>
+            <td>Cm</td>
+            <td>Db</td>
+            <td>Eb</td>
+            <td>Ab</td>
+          </tr>
+          <tr>
+            <td>Bb minor</td>
+            <td>Bbm</td>
+            <td>Cdim</td>
+            <td>Db</td>
+            <td>Ebm</td>
+            <td>Fm</td>
+            <td>Gb</td>
+            <td>Ab</td>
+            <td>Db</td>
+          </tr>
+          <tr>
+            <td>Eb minor</td>
+            <td>Ebm</td>
+            <td>Fdim</td>
+            <td>Gb</td>
+            <td>Abm</td>
+            <td>Bbm</td>
+            <td>Cb</td>
+            <td>Db</td>
+            <td>Gb</td>
+          </tr>
+          <tr>
+            <td>Ab minor</td>
+            <td>Abm</td>
+            <td>Bbdim</td>
+            <td>Cb</td>
+            <td>Dbm</td>
+            <td>Ebm</td>
+            <td>Fb</td>
+            <td>Gb</td>
+            <td>Cb</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+
+
+  <div id="chord-structure" class="chord-structure">
+    <h2>Chord Structure</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Chord Type</th>
+          <th>Formula (Intervals)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Major</td>
+          <td>1 – 3 – 5</td>
+        </tr>
+        <tr>
+          <td>Major 6</td>
+          <td>1 – 3 – 5 – 6</td>
+        </tr>
+        <tr>
+          <td>Major 7</td>
+          <td>1 – 3 – 5 – 7</td>
+        </tr>
+        <tr>
+          <td>Major 9</td>
+          <td>1 – 3 – 5 – 7 – 9</td>
+        </tr>
+        <tr>
+          <td>Major 11</td>
+          <td>1 – 3 – 5 – 7 – 9 – 11</td>
+        </tr>
+        <tr>
+          <td>Sus2</td>
+          <td>1 – 2 – 5</td>
+        </tr>
+        <tr>
+          <td>Sus4</td>
+          <td>1 – 4 – 5</td>
+        </tr>
+        <tr>
+          <td>Dom 7</td>
+          <td>1 – 3 – 5 – b7</td>
+        </tr>
+        <tr>
+          <td>Dom 9</td>
+          <td>1 – 3 – 5 – b7 – 9</td>
+        </tr>
+        <tr>
+          <td>Dom 11</td>
+          <td>1 – 3 – 5 – b7 – 9 – 11</td>
+        </tr>
+        <tr>
+          <td>Min / m</td>
+          <td>1 – b3 – 5</td>
+        </tr>
+        <tr>
+          <td>Min 7</td>
+          <td>1 – b3 – 5 – b7</td>
+        </tr>
+        <tr>
+          <td>Min 9</td>
+          <td>1 – b3 – 5 – b7 – 9</td>
+        </tr>
+        <tr>
+          <td>Min 11</td>
+          <td>1 – b3 – 5 – b7 – 9 – 11</td>
+        </tr>
+        <tr>
+          <td>Min 6</td>
+          <td>1 – b3 – 5 – 6</td>
+        </tr>
+        <tr>
+          <td>Dim</td>
+          <td>1 – b3 – b5</td>
+        </tr>
+        <tr>
+          <td>Dim 7</td>
+          <td>1 – b3 – b5 – bb7</td>
+        </tr>
+        <tr>
+          <td>Dim Min 7</td>
+          <td>1 – b3 – b5 – b7</td>
+        </tr>
+        <tr>
+          <td>Aug</td>
+          <td>1 – 3 – #5</td>
+        </tr>
+        <tr>
+          <td>Aug 7</td>
+          <td>1 – 3 – #5 – b7</td>
+        </tr>
+        <tr>
+          <td>Dim 7 Sus4</td>
+          <td>1 – 4 – b5 – bb7</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="musical-modes" class="musical-modes">
+    <h2>Musical Modes</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Tonic</th>
+          <th>Mode Name</th>
+          <th>Step Pattern</th>
+          <th>Example (C as Tonic)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1st</td>
+          <td>Ionian (Major)</td>
+          <td>W – W – H – W – W – W – H</td>
+          <td>C – D – E – F – G – A – B – C</td>
+        </tr>
+        <tr>
+          <td>2nd</td>
+          <td>Dorian</td>
+          <td>W – H – W – W – W – H – W</td>
+          <td>D – E – F – G – A – B – C – D</td>
+        </tr>
+        <tr>
+          <td>3rd</td>
+          <td>Phrygian</td>
+          <td>H – W – W – W – H – W – W</td>
+          <td>E – F – G – A – B – C – D – E</td>
+        </tr>
+        <tr>
+          <td>4th</td>
+          <td>Lydian</td>
+          <td>W – W – W – H – W – W – H</td>
+          <td>F – G – A – B – C – D – E – F</td>
+        </tr>
+        <tr>
+          <td>5th</td>
+          <td>Mixolydian</td>
+          <td>W – W – H – W – W – H – W</td>
+          <td>G – A – B – C – D – E – F – G</td>
+        </tr>
+        <tr>
+          <td>6th</td>
+          <td>Aeolian (Natural Minor)</td>
+          <td>W – H – W – W – H – W – W</td>
+          <td>A – B – C – D – E – F – G – A</td>
+        </tr>
+        <tr>
+          <td>7th</td>
+          <td>Locrian</td>
+          <td>H – W – W – H – W – W – W</td>
+          <td>B – C – D – E – F – G – A – B</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+</body>
+
+</html>
