@@ -1,0 +1,774 @@
+/* === CSS VARIABLES === */
+:root {
+  --color-bg: #111111;
+  --color-text: #ddd;
+  --color-white: #fff;
+  --color-black: #000;
+  --color-light-gray: #ccc;
+  --color-dark-gray: #444;
+  --color-darker-gray: #222;
+  --color-highlight: #29b6f6;
+  --color-root-note: #ff4081;
+  --color-barre: rgba(255, 117, 4, 0.6);
+  --color-border: #555;
+  --color-light-border: #666;
+  --color-scroll-thumb: #444;
+
+  --key-white: white;
+  --key-black: black;
+  --key-highlight: var(--color-highlight);
+
+  --interval-1: #e91e63;
+  --interval-2: #9c27b0;
+  --interval-b2: #ab47bc;
+  --interval-3: #2196f3;
+  --interval-b3: #03a9f4;
+  --interval-4: #009688;
+  --interval-b5: #4caf50;
+  --interval-5: #8bc34a;
+  --interval-6: #ffc107;
+  --interval-b6: #ff9800;
+  --interval-7: #ff5722;
+  --interval-b7: #795548;
+}
+
+
+body {
+  font-family: sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  margin: 0;
+  padding: 20px;
+}
+
+h1,
+h2 {
+  text-align: center;
+  color: var(--color-white);
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.barre-toggle {
+  background-color: var(--color-dark-gray);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.barre-toggle:hover {
+  background-color: var(--color-light-border);
+}
+
+.barre-label {
+  position: absolute;
+  font-size: 10px;
+  font-weight: bold;
+  border-radius: 4px;
+  padding: 0 3px;
+  color: var(--color-white);
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 6;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 28px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.bottom-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.bottom-controls select,
+.bottom-controls input[type="range"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 4px;
+  background: var(--color-darker-gray);
+  border: 1px solid var(--color-border);
+  color: #eee;
+}
+
+.bottom-controls label,
+.bottom-controls button {
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+
+.chord-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 0;
+}
+
+#chord-input {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background: var(--color-darker-gray);
+  color: #eee;
+  width: 250px;
+  text-align: center;
+}
+
+#chord-name {
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--color-white);
+}
+
+
+#circle,
+#pianoboard,
+#fretboard-container {
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* === CIRCLE OF FIFTHS CANVAS === */
+#circle {
+  background: var(--color-darker-gray);
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+}
+
+/* === PIANO KEYBOARD === */
+#pianoboard {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 10px;
+  background: var(--color-darker-gray);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  margin-top: 20px;
+}
+
+#pianoboard::-webkit-scrollbar {
+  height: 6px;
+}
+
+#pianoboard::-webkit-scrollbar-thumb {
+  background-color: var(--color-dark-gray);
+  border-radius: 3px;
+}
+
+
+.key {
+  display: inline-block;
+  height: 120px;
+  position: relative;
+  border: 1px solid var(--color-black);
+  vertical-align: top;
+  border-radius: 4px;
+}
+
+.key.black {
+  top: 0;
+}
+
+.key:hover {
+  filter: brightness(1.1);
+  cursor: pointer;
+}
+
+.key.highlight,
+#fretboard-container div.highlight {
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  transform: scale(1.05);
+}
+
+
+
+.white {
+  background: white;
+  width: 40px;
+  z-index: 1;
+}
+
+.black {
+  background: black;
+  width: 26px;
+  height: 80px;
+  margin-left: -13px;
+  margin-right: -13px;
+  z-index: 2;
+  position: absolute;
+  left: 30px;
+  top: 0;
+}
+
+.key.highlight {
+  background: var(--color-highlight) !important;
+}
+
+.key .interval-label {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 10px;
+  background: white;
+  color: black;
+  padding: 2px 4px;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.scale-controls {
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  color: #eee;
+}
+
+.scale-controls select {
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 4px;
+  background: var(--color-darker-gray);
+  border: 1px solid var(--color-border);
+  color: #eee;
+}
+
+.scale-controls button {
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+/* === GUITAR FRETBOARD === */
+#fretboard-container {
+  background: linear-gradient(90deg, #3b2f2f, #2e2b28);
+  border: 2px solid var(--color-darker-gray);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: inset 0 0 10px var(--color-black)00088;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  margin-top: 20px;
+}
+
+.fretboard-wrapper {
+  display: flex;
+  background: repeating-linear-gradient(to right,
+      #4b3a3a 0,
+      #4b3a3a 2px,
+      #2e2b28 2px,
+      #2e2b28 40px);
+  border-radius: 6px;
+  box-shadow: inset 0 0 6px var(--color-black)5;
+  position: relative;
+  margin: 0 auto;
+  /* ← CENTER IT */
+}
+
+.fretboard-wrapper {
+  max-width: calc(25 * 40px + 60px);
+  /* 25 frets + approx string label space */
+}
+
+
+.fretboard-wrapper::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  background-image: repeating-linear-gradient(to bottom,
+      transparent,
+      transparent 26px,
+      rgba(255, 255, 255, 0.05) 27px,
+      transparent 28px);
+  pointer-events: none;
+}
+
+#fretboard-container div[role="button"] {
+  width: 40px;
+  height: 36px;
+  background-color: #1c1c1c;
+  border: 1px solid var(--color-light-border);
+  /* REMOVE margin-right */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  color: #eee;
+  border-radius: 4px;
+  box-shadow: inset 0 0 4px var(--color-black);
+  cursor: pointer;
+}
+
+#fretboard-container div[role="button"] .interval-label {
+  position: static;
+  font-size: 11px;
+  font-weight: bold;
+  background: var(--color-white);
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin-top: 2px;
+  color: var(--color-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+#fretboard-container div[role="button"] {
+  flex-direction: column;
+}
+
+#fretboard-container div[role="button"],
+.barre-toggle,
+.scale-controls button,
+.bottom-controls button {
+  user-select: none;
+}
+
+#fretboard-container div.highlight {
+  box-shadow: 0 0 6px #00ffc3;
+}
+
+
+#fretboard>div {
+  display: grid;
+  grid-template-columns: repeat(25, 40px);
+  /* 0 to 24 frets = 25 columns */
+  gap: 0px;
+}
+
+#fretboard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#fretboard-container div.highlight {
+  background-color: #00695c !important;
+  color: white !important;
+}
+
+.fret-numbers {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 4px;
+  gap: 2px;
+}
+
+.fret-numbers div {
+  width: 40px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--color-light-gray);
+}
+
+.fret-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-right: 6px;
+  font-size: 12px;
+  color: #eee;
+  gap: 6px;
+  height: calc(6 * 36px + 5 * 6px);
+  /* 6 rows of 36px + 5 gaps of 6px */
+}
+
+
+.root-note {
+  background-color: var(--color-root-note) !important;
+  color: white !important;
+}
+
+.interval-charts {
+  display: grid;
+  max-width: fit-content;
+  justify-content: center;
+  margin: 40px auto;
+  padding: 20px;
+  background: #1a1a1a;
+  border: 1px solid var(--color-dark-gray);
+  border-radius: 8px;
+  color: #eee;
+}
+
+.interval-charts h2,
+.interval-charts h3 {
+  text-align: center;
+  color: var(--color-white);
+  margin-bottom: 12px;
+}
+
+.interval-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.interval-table th,
+.interval-table td {
+  border: 1px solid var(--color-dark-gray);
+  padding: 6px 8px;
+  white-space: nowrap;
+}
+
+.interval-table th:first-child,
+.interval-table td:first-child {
+  font-weight: bold;
+  background: #2a2a2a;
+  text-align: left;
+}
+
+
+.interval-table tbody tr:nth-child(odd) {
+  background: var(--color-darker-gray);
+}
+
+
+
+/* === INTERVAL LABELS === */
+.interval-label {
+  position: absolute;
+  font-size: 11px;
+  font-weight: bold;
+  background: var(--color-white);
+  border-radius: 4px;
+  padding: 0 4px;
+  pointer-events: none;
+  z-index: 3;
+  bottom: 2px;
+  right: 2px;
+  color: var(--color-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+
+/* === INTERVAL COLOR CLASSES === */
+.interval-1 {
+  background-color: #e91e63;
+  color: white;
+}
+
+.interval-2 {
+  background-color: #9c27b0;
+  color: white;
+}
+
+.interval-b2 {
+  background-color: #ab47bc;
+  color: white;
+}
+
+.interval-3 {
+  background-color: #2196f3;
+  color: white;
+}
+
+.interval-b3 {
+  background-color: #03a9f4;
+  color: white;
+}
+
+.interval-4 {
+  background-color: #009688;
+  color: white;
+}
+
+.interval-b5 {
+  background-color: #4caf50;
+  color: white;
+}
+
+.interval-5 {
+  background-color: #8bc34a;
+  color: white;
+}
+
+.interval-6 {
+  background-color: #ffc107;
+  color: black;
+}
+
+.interval-b6 {
+  background-color: #ff9800;
+  color: black;
+}
+
+.interval-7 {
+  background-color: #ff5722;
+  color: white;
+}
+
+.interval-b7 {
+  background-color: #795548;
+  color: white;
+}
+
+.barre-visual {
+  position: absolute;
+  width: 6px;
+  background-color: var(--color-barre);
+  border-radius: 3px;
+  z-index: 5;
+  transition: all 0.2s ease;
+}
+
+.chord-key-chart {
+  margin: 40px auto;
+  max-width: 800px;
+  padding: 20px;
+  background: #1a1a1a;
+  border: 1px solid var(--color-dark-gray);
+  border-radius: 8px;
+  color: #eee;
+}
+
+.chord-key-chart h2 {
+  text-align: center;
+  margin-bottom: 16px;
+  color: var(--color-white);
+}
+
+.chord-key-chart table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.chord-key-chart th,
+.chord-key-chart td {
+  border: 1px solid var(--color-dark-gray);
+  padding: 8px 12px;
+  text-align: center;
+}
+
+.chord-key-chart thead {
+  background: #2a2a2a;
+  font-weight: bold;
+}
+
+.chord-key-chart tbody tr:nth-child(even) {
+  background: var(--color-darker-gray);
+}
+
+
+#chord-sidebar {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  background: #1a1a1a;
+  padding: 24px;
+  border: 1px solid var(--color-dark-gray);
+  border-radius: 8px;
+  color: #eee;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+
+
+#chord-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chord-group {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.chord-group h4 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: var(--color-white);
+  border-bottom: 1px solid var(--color-dark-gray);
+  padding-bottom: 4px;
+}
+
+.chord-group-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.chord-tab {
+  font-family: monospace;
+  font-size: 16px;
+  background: #2a2a2a;
+  padding: 6px;
+  border-radius: 4px;
+  white-space: pre;
+  text-align: left;
+  min-width: 130px;
+}
+
+.chord-input-row {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.chord-help-box {
+  background: var(--color-darker-gray);
+  border: 1px solid var(--color-dark-gray);
+  padding: 12px;
+  border-radius: 6px;
+  color: var(--color-light-gray);
+  font-size: 13px;
+  max-width: 180px;
+}
+
+.chord-help-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+}
+
+.chord-structure {
+  margin: 40px auto;
+  max-width: 600px;
+  padding: 20px;
+  background: #1a1a1a;
+  border: 1px solid var(--color-dark-gray);
+  border-radius: 8px;
+  color: #eee;
+}
+
+.chord-structure h2 {
+  text-align: center;
+  margin-bottom: 16px;
+  color: var(--color-white);
+}
+
+.chord-structure table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.chord-structure th,
+.chord-structure td {
+  border: 1px solid var(--color-dark-gray);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.chord-structure thead {
+  background: #2a2a2a;
+  font-weight: bold;
+}
+
+.chord-structure tbody tr:nth-child(even) {
+  background: var(--color-darker-gray);
+}
+
+.musical-modes {
+  margin: 40px auto;
+  max-width: 700px;
+  padding: 20px;
+  background: #1a1a1a;
+  border: 1px solid var(--color-dark-gray);
+  border-radius: 8px;
+  color: #eee;
+}
+
+.musical-modes h2 {
+  text-align: center;
+  margin-bottom: 16px;
+  color: var(--color-white);
+}
+
+.musical-modes table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.musical-modes th,
+.musical-modes td {
+  border: 1px solid var(--color-dark-gray);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.musical-modes thead {
+  background: #2a2a2a;
+  font-weight: bold;
+}
+
+.musical-modes tbody tr:nth-child(even) {
+  background: var(--color-darker-gray);
+}
+
+
+/* === MOBILE === */
+@media (max-width: 768px) {
+  #fretboard-container div[role="button"] {
+    width: 30px;
+    height: 30px;
+    font-size: 9px;
+  }
+
+  .interval-label {
+    font-size: 9px;
+    bottom: 1px;
+    right: 1px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .controls,
+  .bottom-controls,
+  .scale-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #chord-input {
+    width: 90%;
+  }
+
+  .chord-tab {
+    font-size: 14px;
+  }
+}
